@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_web/controller/utility_input_controller.dart';
+
 import 'package:get/get.dart';
-import '../../controller/home_controller.dart';
-import '../../controller/screen_selection_controller.dart';
-import '../../model/request_model/page_info.dart';
+import '../../../domain/model/request_model/page_info.dart';
+import '../../controller/controller/screen_selection_controller.dart';
+import '../../controller/controller/utility_input_controller.dart';
+
 
 class UtilityInputComponent extends StatelessWidget {
   final UtilityInputController _controller = Get.put(UtilityInputController());

@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../api/ComponentService.dart';
-import '../common/common.dart';
-import '../model/request_model/component_request.dart';
-import '../model/request_model/page_info.dart';
+import '../../../common/common.dart';
+import '../../../data/data_sources/api/api/ComponentService.dart';
+import '../../../domain/model/request_model/component_request.dart';
+import '../../../domain/model/request_model/page_info.dart';
+
 
 // Error Messages Constants
 const Map<String, String> errorMessages = {
@@ -166,7 +167,7 @@ class HomeController extends GetxController {
   ComponentRequest _createRequestModel() {
     final selectedUtility = selectedUtilityDropdownValue.value;
 
-    return ComponentRequest(
+    return     ComponentRequest(
       type: selectedDropdownValue.value,
       label: labelTextFieldController.text,
       image: selectedUtility != null

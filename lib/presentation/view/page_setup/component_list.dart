@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../controller/component_controller.dart';
-import '../../model/request_model/page_info.dart';
-import '../../model/response_model/component_response.dart';
+
+import '../../../data/data_sources/api/api/ComponentService.dart';
+import '../../../domain/model/request_model/page_info.dart';
+import '../../../domain/model/response_model/component_response.dart';
+import '../../controller/controller/component_controller.dart';
+
 
 class MyComponentList extends StatelessWidget {
   final PageInfo pageInfo;
+  final ComponentService componentService = ComponentService();
 
-  const MyComponentList({super.key, required this.pageInfo});
+  MyComponentList({super.key, required this.pageInfo});
 
   @override
   Widget build(BuildContext context) {
-    final ComponentController componentController =
-    Get.put(ComponentController(pageInfo));
+
+
+    final ComponentController componentController = Get.put(ComponentController(pageInfo, componentService));
 
     return SingleChildScrollView(
       child: Padding(
@@ -56,8 +61,9 @@ class MyComponentList extends StatelessWidget {
                 ),
                 onDismissed: (direction) {
                   componentController.deleteComponent(
-                    component.id ?? '',
-                    pageInfo,
+                    component.id ?? '', // Component ID
+                    pageInfo,             // PageInfo
+                    context,              // Pass the BuildContext here
                   );
                   componentController.components.removeAt(index);
 

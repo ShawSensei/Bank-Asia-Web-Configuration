@@ -2,7 +2,11 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
-import '../model/request_model/component_request.dart';
+import '../../../../domain/model/request_model/component_request.dart';
+import '../../../../domain/model/request_model/utility_req_model.dart';
+import '../../../../domain/model/response_model/component_response.dart';
+
+
 
 class ComponentService {
   final String baseUrl = "https://api.example.com"; // Replace with your actual API base URL
@@ -20,6 +24,24 @@ class ComponentService {
     return jsonDecode(response.body);  // Assuming the API returns a JSON response
   }
 
+  // Fetch components with POST request
+  Future<List<ComponentResponse>> fetchComponents(
+      String url,
+      UtilityReqModel requestBody,
+      ) async {
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(requestBody.toJson()),
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      return data.map((json) => ComponentResponse.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to fetch utilities');
+    }
+  }
   // General method to handle API requests
   Future<Map<String, dynamic>> apiRequest(
       String endpoint, {

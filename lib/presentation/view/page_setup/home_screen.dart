@@ -3,8 +3,9 @@
 import 'package:flutter/material.dart';
 
 
-import '../../common/web_header.dart';
-import '../../model/request_model/page_info.dart';
+import '../../../common/web_header.dart';
+import '../../../domain/model/request_model/page_info.dart';
+
 import 'component_list.dart';
 
 import 'input_component.dart';

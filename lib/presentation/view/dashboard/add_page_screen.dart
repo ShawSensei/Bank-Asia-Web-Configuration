@@ -1,8 +1,8 @@
 
 import 'package:flutter/material.dart';
-import 'package:flutter_web/presentation/dashboard/page_list.dart';
+import 'package:flutter_web/presentation/view/dashboard/page_list.dart';
 
-import '../../common/web_header.dart';
+import '../../../common/web_header.dart';
 import 'input_page.dart';
 
 

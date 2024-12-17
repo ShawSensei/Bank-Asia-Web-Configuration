@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../controller/add_page_controller.dart';
-import '../../model/request_model/page_info.dart';
-import '../../model/response_model/page_response.dart';
+
+import '../../../domain/model/request_model/page_info.dart';
+import '../../../domain/model/response_model/page_response.dart';
+import '../../controller/controller/add_page_controller.dart';
+
+import '../screen_type_selection/screen_type_selection.dart';
 
 class PageList extends StatelessWidget {
   final AddPageController componentController = Get.put(AddPageController());
@@ -102,7 +105,13 @@ class PageList extends StatelessWidget {
           pageRoute: page.pageRoute,
         );
         // Example: Navigate to a new screen with page details
-        // Get.to(() => HomeScreen(pageInfo: info));
+        Get.to(() =>
+            ScreenTypeSelection(
+                 pageInfo: info
+               ),
+        );
+        // HomeScreen(pageInfo: info));
+
       },
       child: Container(
         padding: const EdgeInsets.all(16.0),

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../common/web_header.dart';
-import '../../controller/screen_selection_controller.dart';
-import '../../model/request_model/page_info.dart';
+
+import '../../../common/web_header.dart';
+import '../../../domain/model/request_model/page_info.dart';
+import '../../controller/controller/screen_selection_controller.dart';
+import '../page_setup/component_list.dart';
 import '../page_setup/input_component.dart';
 import '../page_setup/utility_input_component.dart';
-import '../dashboard/page_list.dart';
+import '../page_setup/utility_input_list.dart';
 
 class ScreenTypeSelection extends StatelessWidget {
   final PageInfo pageInfo;
@@ -69,6 +71,7 @@ class ScreenTypeSelection extends StatelessWidget {
                   maxHeight: 600, // Adjust as needed for layout
                 ),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     // Content Section
                     Expanded(
@@ -77,13 +80,12 @@ class ScreenTypeSelection extends StatelessWidget {
                         padding: const EdgeInsets.all(20.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start, // Align content to the top
                           children: [
                             Obx(() {
-                              if (controller.selectedPageType.value ==
-                                  "Utility Page") {
+                              if (controller.selectedPageType.value == "Utility Page") {
                                 return UtilityInputComponent(pageInfo: pageInfo);
-                              } else if (controller.selectedPageType.value ==
-                                  "Biller Page") {
+                              } else if (controller.selectedPageType.value == "Biller Page") {
                                 return InputComponent(pageInfo: pageInfo);
                               } else {
                                 return const Center(
@@ -98,14 +100,34 @@ class ScreenTypeSelection extends StatelessWidget {
                         ),
                       ),
                     ),
-                    // Page List Section
                     Expanded(
                       flex: 1,
                       child: Padding(
                         padding: const EdgeInsets.all(20.0),
-                        child: PageList(),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start, // Align content to the top
+                          children: [
+                            Obx(() {
+                              if (controller.selectedPageType.value == "Utility Page") {
+                                return  UtilityInputList(); // Display UtilityInputList
+                              } else if (controller.selectedPageType.value == "Biller Page") {
+                                return MyComponentList(pageInfo: pageInfo); // Display MyComponentList
+                              } else {
+                                return const Center(
+                                  child: Text(
+                                    "Please select a valid page type.",
+                                    style: TextStyle(color: Colors.grey),
+                                  ),
+                                );
+                              }
+                            }),
+                          ],
+                        ),
                       ),
                     ),
+
+
                   ],
                 ),
               ),

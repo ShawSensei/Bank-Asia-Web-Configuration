@@ -1,10 +1,12 @@
 import 'dart:convert'; // For base64 encoding
 import 'package:flutter/material.dart';
-import 'package:flutter_web/model/request_model/page_info.dart';
 import 'package:get/get.dart';
-import '../api/ComponentService.dart';
-import '../common/common.dart';
-import '../model/request_model/component_request.dart';
+
+import '../../../common/common.dart';
+import '../../../data/data_sources/api/api/ComponentService.dart';
+import '../../../domain/model/request_model/component_request.dart';
+import '../../../domain/model/request_model/page_info.dart';
+
 
 // Error Messages Constants
 const Map<String, String> errorMessages = {
@@ -22,6 +24,7 @@ class UtilityInputController extends GetxController {
   var selectedIconValue = ''.obs; // Base64 string for selected icon
   var utilityNameTextFieldController = TextEditingController();
   var labelTextFieldController = TextEditingController();
+
 
   final List<String> utilityTypeItems = ['Electricity', 'Water', 'Gas'];
   final Map<String, String> utilityCodes = {
@@ -41,7 +44,6 @@ class UtilityInputController extends GetxController {
     {'icon': Icons.water_drop, 'label': 'WASA'},
     {'icon': Icons.fire_extinguisher, 'label': 'GASA'},
   ];
-
 
   // Generate base64 icon string for the selected utility type
   String _generateBase64Icon(String utilityType) {
@@ -84,6 +86,7 @@ class UtilityInputController extends GetxController {
       if (response['statusCode'] == 200 || response['statusCode'] == 201) {
         _clearUtilityInputs();
         Common.showFlutterSnackbar(context, "Utility saved successfully!", Colors.green);
+       // fetchUtilityData(context); // Refresh the utility list after saving
       } else {
         Common.showFlutterSnackbar(context, "Error: ${response['message']}", Colors.amber.shade400);
       }
@@ -92,6 +95,8 @@ class UtilityInputController extends GetxController {
       Common.showFlutterSnackbar(context, "Error saving utility", Colors.amber.shade400);
     }
   }
+
+
 
   // Utility Input Validation
   String? _validateUtilityInputs() {
@@ -109,5 +114,6 @@ class UtilityInputController extends GetxController {
     selectedUtilityTypeValue.value = '';
     selectedIconValue.value = '';
     utilityNameTextFieldController.clear();
+    labelTextFieldController.clear();
   }
 }

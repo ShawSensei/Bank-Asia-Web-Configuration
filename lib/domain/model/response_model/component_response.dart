@@ -16,6 +16,13 @@ class ComponentResponse {
   final int? selectedValue;
   final dynamic items;
 
+  // New fields from the updated response
+  final String? buttonType; // New field for buttonType
+  final String? hint; // New field for hint (for inputField type)
+  final String? regex; // New field for regex (for inputField type)
+  final bool? hasSampleButton; // New field for hasSampleButton
+  final String? sampleImage; // New field for sampleImage (for buttons)
+
   ComponentResponse({
     this.id,
     this.name,
@@ -33,6 +40,11 @@ class ComponentResponse {
     this.method,
     this.selectedValue,
     this.items,
+    this.buttonType,
+    this.hint,
+    this.regex,
+    this.hasSampleButton,
+    this.sampleImage,
   });
 
   factory ComponentResponse.fromJson(Map<String, dynamic> json) {
@@ -53,6 +65,13 @@ class ComponentResponse {
       method: json['method'] as String?,
       selectedValue: json['selectedValue'] as int?,
       items: json['items'],
+
+      // New fields from the updated response
+      buttonType: json['buttonType'] as String?,
+      hint: json['hint'] as String?,
+      regex: json['regex'] as String?,
+      hasSampleButton: json['hasSampleButton'] as bool?,
+      sampleImage: json['sampleImage'] as String?,
     );
   }
 
@@ -74,10 +93,20 @@ class ComponentResponse {
       'method': method,
       'selectedValue': selectedValue,
       'items': items,
+
+      // New fields for button type components
+      'buttonType': buttonType,
+      'hint': hint,
+      'regex': regex,
+      'hasSampleButton': hasSampleButton,
+      'sampleImage': sampleImage,
     };
   }
 
   bool get isRequired => required ?? false;
   String get validationMessage => validationMsg ?? 'This field is required';
   bool get isEnabled => required ?? false;
+
+  // Additional getter for buttons to identify if URL exists
+  bool get isButtonWithUrl => (buttonType != null && url != null);
 }

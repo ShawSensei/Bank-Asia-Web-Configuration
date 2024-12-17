@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 
-import '../../controller/add_page_controller.dart';
+
+import '../../controller/controller/add_page_controller.dart';
 
 
 class InputPage extends StatelessWidget {

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../controller/home_controller.dart';
-import '../../model/request_model/page_info.dart';
+
+import '../../../domain/model/request_model/page_info.dart';
+import '../../controller/controller/home_controller.dart';
+
 
 class InputComponent extends StatelessWidget {
   final HomeController _controller = Get.put(HomeController());
