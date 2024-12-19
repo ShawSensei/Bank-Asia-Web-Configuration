@@ -1,77 +1,141 @@
 import 'dart:convert';
+import 'dart:typed_data';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
 
 import '../../../common/common.dart';
-import '../../../data/data_sources/api/api/ComponentService.dart';
+import '../../../common/header_data.dart';
+import '../../../data/data_sources/dto/utilities_dto.dart';
 import '../../../domain/model/request_model/page_info.dart';
-import '../../../domain/model/response_model/utility_list_res_model.dart';
-
-
+import '../../../domain/model/response_model/utility_data_model.dart';
+import '../../../domain/usecase/utility_usecases.dart';
+import '../../../main.dart';
+import '../../../util/resource.dart';
+import '../../../util/utility_variables.dart';
+import '../../custom_view/custom_dialog.dart';
 
 class UtilityListController extends GetxController {
-  final String baseUrl = "http://10.11.201.137:8085"; // Replace with your API URL
-  var utilities = <Utility>[].obs;
+  final _utilityUsecase = getIt<UtilityUsecases>();
+
+  final _isLoading = false.obs;
+  RxInt selectedUtilityIndex = RxInt(-1);
+
+  // Make utilitiesList and billerList observable
+  var utilitiesList = <Utility>[].obs; // Observable list of utilities
+  var billerList = <Biller>[].obs; // Observable list of billers
+
+  // Create a list to manage the color for each utility item
+  var utilityItemColors = <Rx<Color>>[].obs;
 
   final PageInfo pageInfo;
-  final ComponentService _componentService;
 
-  UtilityListController(this.pageInfo, this._componentService);
+  void loading(bool value) {
+    if (value && !_isLoading.value) {
+      CustomDialog.showLoadingDialog();
+    } else if (!value && _isLoading.value) {
+      Get.back();
+    }
+    _isLoading.value = value;
+  }
+
+  UtilityListController(this.pageInfo);
 
   @override
   void onInit() {
     super.onInit();
-    fetchBillerList(); // Call without context
+    utilityItemColors.assignAll(List.generate(utilitiesList.length, (_) => Rx<Color>(Colors.white)));
   }
 
-  // Fetch Biller List
-  Future<void> fetchBillerList() async {
-    try {
-      final response = await http.get(
-        Uri.parse("$baseUrl/bill-pay/v1/bill-pay/utilities"),
-        headers: {"Content-Type": "application/json"},
-      );
+  // Fetch Utility List
+  Future<void> getUtilitiesInfo() async {
+    _utilityUsecase.utilitiesInfoUsecase(HeaderData.headerPublic).listen((resource) {
+      switch (resource.status) {
+        case Status.loading:
+          loading(true);
+          break;
+        case Status.success:
+          loading(false);
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final utilityListResponse = UtilityListResModel.fromJson(data);
+          // Cast utilities list to proper type (Utility)
+          utilitiesList.assignAll(
+            (resource.data!.utilities ?? []).map((utilityDto) => utilityDto.toUtility()).toList(),
+          );
 
-        // Update the observable list with fetched utilities
-        utilities.value = utilityListResponse.utilities;
-      } else {
-        debugPrint("Error fetching utilities: ${response.statusCode}");
+          // Map BillerDto to Biller and filter out nulls
+          var allBillers = utilitiesList
+              .expand((utility) => utility.billers ?? []) // Flatten all biller lists
+              .cast<BillerDto>() // Ensure it's explicitly cast to BillerDto
+              .map((billerDto) => billerDto.toBiller()) // Convert each BillerDto to Biller
+              .where((biller) => biller != null) // Filter out null billers (if any)
+              .toList(); // Convert to List<Biller>
+
+          // Assign to observable billerList
+          billerList.assignAll(allBillers);
+
+          // Initialize utilityItemColors after data is loaded
+          utilityItemColors.assignAll(List.generate(utilitiesList.length, (_) => Rx<Color>(Colors.white)));
+          break;
+        case Status.error:
+          loading(false);
+          CustomDialog.showError('${resource.errorMessage}');
+          break;
       }
-    } catch (error) {
-      debugPrint("Error fetching biller list: $error");
+    });
+  }
+
+
+
+  void filterBillers(String utilityCode, int index) {
+    debugPrint("index $index");
+    debugPrint("selectedUtilityIndex.value ${selectedUtilityIndex.value}");
+
+    // Change the color of the tapped item
+    if (index == selectedUtilityIndex.value) {
+      utilityItemColors[index].value = Colors.blue.shade100;
+    } else {
+      utilityItemColors[index].value = Colors.white;
+    }
+
+    // Filter the billers based on the selected utility code
+    billerList.value = UtilityVariables.billerList
+        .where((biller) => biller.utilityCode == utilityCode)
+        .toList();
+  }
+
+  // Add a utility to the list
+  void addUtility(Utility utility) {
+    utilitiesList.add(utility);  // This will automatically update the UI
+    update();  // Trigger the UI update
+  }
+
+  // Delete utility method
+  void deleteUtility(int index) {
+    utilitiesList.removeAt(index);
+    update();  // Trigger the UI update after deletion
+  }
+
+  IconData decodeBase64ToIconData(String base64Icon) {
+    try {
+      // Decode the base64 string to bytes
+      final bytes = base64Decode(base64Icon);
+
+      // Convert the bytes back to the integer value (big-endian)
+      final int value = ByteData.sublistView(Uint8List.fromList(bytes)).getInt32(0, Endian.big);
+
+      // Ensure the value is within the valid range for IconData
+      if (value >= 0 && value <= 0x10FFFF) {
+        return IconData(value, fontFamily: 'MaterialIcons');
+      } else {
+        throw const FormatException("Invalid IconData value");
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error decoding base64 icon: $e');
+      }
+      return Icons.help; // Return a default icon in case of failure
     }
   }
 
-  // Fetch with Snackbar (optional for UI calls)
-  Future<void> fetchBillerListWithSnackbar(BuildContext context) async {
-    await fetchBillerList(); // Fetch the data
-    Common.showFlutterSnackbar(context, "Utilities fetched successfully!", Colors.green);
-  }
-
-  // Delete Component
-  Future<void> deleteComponent(String id, PageInfo info, BuildContext context) async {
-    try {
-      final response = await http.delete(
-        Uri.parse("$baseUrl/components/${info.pageRoute}/$id"),
-        headers: {"Content-Type": "application/json"},
-      );
-
-      if (response.statusCode == 200 || response.statusCode == 204) {
-        // Re-fetch the list after deletion
-        await fetchBillerList();
-        Common.showFlutterSnackbar(context, "Component deleted successfully!", Colors.green);
-      } else {
-        debugPrint("Error deleting component: ${response.statusCode}");
-        Common.showFlutterSnackbar(context, "Error deleting component", Colors.red);
-      }
-    } catch (error) {
-      debugPrint("Error deleting component: $error");
-      Common.showFlutterSnackbar(context, "Error deleting component", Colors.red);
-    }
-  }
 }

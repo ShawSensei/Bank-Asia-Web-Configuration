@@ -1,22 +1,21 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'utility_list_res_model.dart';
+part of 'utility_data_model.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-UtilityListResModel _$UtilityListResModelFromJson(Map<String, dynamic> json) =>
-    UtilityListResModel(
-      statusCode: (json['statusCode'] as num).toInt(),
-      message: json['message'] as String,
-      utilities: (json['utilities'] as List<dynamic>)
-          .map((e) => Utility.fromJson(e as Map<String, dynamic>))
+UtilityDataModel _$UtilityDataModelFromJson(Map<String, dynamic> json) =>
+    UtilityDataModel(
+      statusCode: (json['statusCode'] as num?)?.toInt(),
+      message: json['message'] as String?,
+      utilities: (json['utilities'] as List<dynamic>?)
+          ?.map((e) => Utility.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 
-Map<String, dynamic> _$UtilityListResModelToJson(
-        UtilityListResModel instance) =>
+Map<String, dynamic> _$UtilityDataModelToJson(UtilityDataModel instance) =>
     <String, dynamic>{
       'statusCode': instance.statusCode,
       'message': instance.message,

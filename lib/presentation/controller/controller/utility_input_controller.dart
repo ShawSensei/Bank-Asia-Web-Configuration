@@ -1,12 +1,14 @@
 import 'dart:convert'; // For base64 encoding
 import 'package:flutter/material.dart';
+import 'package:flutter_web/presentation/controller/controller/utility_list_controller.dart';
 import 'package:get/get.dart';
+import 'dart:typed_data';
 
 import '../../../common/common.dart';
-import '../../../data/data_sources/api/api/ComponentService.dart';
-import '../../../domain/model/request_model/component_request.dart';
+import '../../../data/data_sources/dto/utilities_dto.dart';
+import '../../../domain/model/response_model/utility_data_model.dart';
+import '../../../util/utility_variables.dart'; // For shared utility variables
 import '../../../domain/model/request_model/page_info.dart';
-
 
 // Error Messages Constants
 const Map<String, String> errorMessages = {
@@ -16,7 +18,8 @@ const Map<String, String> errorMessages = {
 };
 
 class UtilityInputController extends GetxController {
-  final ComponentService _componentService = ComponentService(); // API Service
+  final UtilityListController _listController = Get.find<UtilityListController>();
+
 
   // Utility-specific controllers and observable variables
   var selectedUtilityTypeValue = ''.obs;
@@ -24,7 +27,6 @@ class UtilityInputController extends GetxController {
   var selectedIconValue = ''.obs; // Base64 string for selected icon
   var utilityNameTextFieldController = TextEditingController();
   var labelTextFieldController = TextEditingController();
-
 
   final List<String> utilityTypeItems = ['Electricity', 'Water', 'Gas'];
   final Map<String, String> utilityCodes = {
@@ -45,17 +47,19 @@ class UtilityInputController extends GetxController {
     {'icon': Icons.fire_extinguisher, 'label': 'GASA'},
   ];
 
-  // Generate base64 icon string for the selected utility type
   String _generateBase64Icon(String utilityType) {
     final icon = utilityIcons[utilityType];
     if (icon != null) {
-      // Convert the icon into base64 (simulate by encoding icon.toString())
-      return base64Encode(utf8.encode(icon.toString()));
+      // Convert the icon into base64 by encoding the integer value (icon.codePoint)
+      final int iconValue = icon.codePoint; // Get the integer value of the icon
+      final bytes = ByteData(4)..setInt32(0, iconValue, Endian.big); // Store the value in 4 bytes
+      return base64Encode(bytes.buffer.asUint8List()); // Convert to base64
     }
     return '';
   }
 
-  // Save Utility Data
+
+// Save utility data
   Future<void> saveUtilityData(BuildContext context, PageInfo pageInfo) async {
     String? validationMessage = _validateUtilityInputs();
 
@@ -64,36 +68,30 @@ class UtilityInputController extends GetxController {
       return;
     }
 
-    // Map the selected utility type to its code and base64 icon
     String utilityCode = utilityCodes[selectedUtilityTypeValue.value] ?? '';
     String base64Icon = _generateBase64Icon(selectedUtilityTypeValue.value);
 
-    // Prepare request model for utility data
-    final utilityRequest = ComponentRequest(
-      type: 'Utility',
-      utilityType: selectedUtilityTypeValue.value,
+    final utility = Utility(
+      utilityCode: utilityCode,
       utilityName: utilityNameTextFieldController.text,
       utilityIcon: base64Icon,
-      label: labelTextFieldController.text,
-      utilityCode: utilityCode,
+      billers: [],
     );
 
-    try {
-      // Send data to API
-      final response = await _componentService.saveComponent('utilityRoute', utilityRequest);
+    final utilityData = UtilityDto(
+      utilityCode: utilityCode,
+      utilityName: utility.utilityName,
+      utilityIcon: utility.utilityIcon,
+      billers: [],
+    );
 
-      // Handle response
-      if (response['statusCode'] == 200 || response['statusCode'] == 201) {
-        _clearUtilityInputs();
-        Common.showFlutterSnackbar(context, "Utility saved successfully!", Colors.green);
-       // fetchUtilityData(context); // Refresh the utility list after saving
-      } else {
-        Common.showFlutterSnackbar(context, "Error: ${response['message']}", Colors.amber.shade400);
-      }
-    } catch (error) {
-      debugPrint("Error saving utility: $error");
-      Common.showFlutterSnackbar(context, "Error saving utility", Colors.amber.shade400);
-    }
+    UtilityVariables.utilitiesList.add(utilityData);
+
+    // Add to the list in UtilityListController
+    _listController.addUtility(utility);
+
+    _clearUtilityInputs();
+    Common.showFlutterSnackbar(context, "Utility saved locally!", Colors.green);
   }
 
 
@@ -111,9 +109,11 @@ class UtilityInputController extends GetxController {
 
   // Clear utility-specific inputs
   void _clearUtilityInputs() {
-    selectedUtilityTypeValue.value = '';
-    selectedIconValue.value = '';
-    utilityNameTextFieldController.clear();
-    labelTextFieldController.clear();
+    selectedUtilityTypeValue.value = '';  // Reset utility type
+    selectedImageValue.value = null;  // Reset selected image/icon
+    selectedIconValue.value = '';  // Reset selected icon value (if any)
+
+    utilityNameTextFieldController.clear();  // Clear the utility name text field
+    labelTextFieldController.clear();  // Clear the label text field
   }
 }

@@ -37,10 +37,17 @@ dependencies:
   cupertino_icons: ^1.0.8
   firebase_core: ^2.8.0
   firebase_database:
-  http: ^1.0.0
-
-  get:
-  json_annotation: ^4.8.0
+  http: ^1.2.1
+  dio: ^5.7.0
+  json_serializable: ^6.8.0
+  retrofit_generator: ^8.1.0
+  retrofit: ^4.1.0
+  dropdown_button2: ^2.3.9
+  http_parser: ^4.0.2
+  get: ^4.6.6
+  json_annotation: ^4.9.0
+  get_it:
+  flutter_sequence_animation: ^4.0.0
 
 dev_dependencies:
   flutter_test:
