@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_web/presentation/controller/controller/utility_list_controller.dart';
 import 'package:flutter_web/presentation/view/dashboard/add_page_screen.dart';
+import 'package:flutter_web/presentation/view/screen_type_selection/screen_type_selection.dart';
 import 'package:get/get.dart';
 
 import 'package:get/get_navigation/src/root/get_material_app.dart';
@@ -32,13 +33,13 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home:
-      const AddPageScreen()
-      // ScreenTypeSelection(
-      //   pageInfo: PageInfo(
-      //     pageName: 'Placeholder',
-      //     pageRoute: '/placeholder', // Default route
-      //   ),
-      // ),
+      // const AddPageScreen()
+      ScreenTypeSelection(
+        pageInfo: PageInfo(
+          pageName: 'Placeholder',
+          pageRoute: '/placeholder', // Default route
+        ),
+      ),
     );
   }
 }

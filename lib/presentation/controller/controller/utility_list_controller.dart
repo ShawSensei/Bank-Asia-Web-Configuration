@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_web/data/data_sources/dto/reg_info_dto.dart';
 import 'package:get/get.dart';
 
 import '../../../common/common.dart';
@@ -25,6 +26,7 @@ class UtilityListController extends GetxController {
   // Make utilitiesList and billerList observable
   var utilitiesList = <Utility>[].obs; // Observable list of utilities
   var billerList = <Biller>[].obs; // Observable list of billers
+  var regInformation = RegInfoDto().obs; // Observable list of billers
 
   // Create a list to manage the color for each utility item
   var utilityItemColors = <Rx<Color>>[].obs;
@@ -45,7 +47,9 @@ class UtilityListController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    getRegInfo();
     utilityItemColors.assignAll(List.generate(utilitiesList.length, (_) => Rx<Color>(Colors.white)));
+
   }
 
   // Fetch Utility List
@@ -136,6 +140,25 @@ class UtilityListController extends GetxController {
       }
       return Icons.help; // Return a default icon in case of failure
     }
+  }
+
+  Future<void> getRegInfo() async {
+    _utilityUsecase.regInfoUsecase(HeaderData.headerPublic).listen((resource) {
+      switch (resource.status) {
+        case Status.loading:
+          loading(true);
+          break;
+        case Status.success:
+          loading(false);
+          final resData = resource.data!;
+          regInformation.value = resData;
+          break;
+        case Status.error:
+          loading(false);
+          CustomDialog.showError('${resource.errorMessage}');
+          break;
+      }
+    });
   }
 
 }

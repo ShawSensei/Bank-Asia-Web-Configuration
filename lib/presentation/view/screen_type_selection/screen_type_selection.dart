@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_web/presentation/view/page_setup/dynamic_single_page.dart';
 import 'package:get/get.dart';
 
 import '../../../common/web_header.dart';
 import '../../../domain/model/request_model/page_info.dart';
 import '../../controller/controller/screen_selection_controller.dart';
 import '../page_setup/component_list.dart';
+import '../page_setup/dynamic_page_view.dart';
 import '../page_setup/input_component.dart';
 import '../page_setup/utility_input_component.dart';
 import '../page_setup/utility_input_list.dart';
@@ -23,16 +25,8 @@ class ScreenTypeSelection extends StatelessWidget {
       appBar: const WebHeader(),
       body: Column(
         children: [
-          // Page Title
-          const Padding(
-            padding: EdgeInsets.all(20.0),
-            child: Text(
-              "Page Input",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          // Dropdown Section (outside the scrollable area)
+          SizedBox(height: 20),
+          // Dropdown Section
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
             child: Row(
@@ -61,80 +55,102 @@ class ScreenTypeSelection extends StatelessWidget {
               ],
             ),
           ),
+
+          // Page Name Input Field
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+            child: TextFormField(
+              controller: controller.pageNameController,
+              decoration: InputDecoration(
+                labelText: "Page Name",
+                hintText: "Enter the name of the page",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              onChanged: (value) {
+                controller.updatePageName(value);
+              },
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return "Page name is required.";
+                }
+                return null;
+              },
+            ),
+          ),
           const SizedBox(height: 20),
           // Scrollable Content Section
           Expanded(
-
             child: SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(
-                  maxHeight: 600, // Adjust as needed for layout
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    // Content Section
-                    Expanded(
-                      flex: 1,
-                      child: Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start, // Align content to the top
-                          children: [
-                            Obx(() {
-                              if (controller.selectedPageType.value == "Utility Page") {
-                                return UtilityInputComponent(pageInfo: pageInfo);
-                              } else if (controller.selectedPageType.value == "Biller Page") {
-                                return InputComponent(pageInfo: pageInfo);
-                              } else {
-                                return const Center(
-                                  child: Text(
-                                    "Please select a page type.",
-                                    style: TextStyle(color: Colors.grey),
-                                  ),
-                                );
-                              }
-                            }),
-                          ],
-                        ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  // Content Section
+                  Expanded(
+                    flex: 1,
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Obx(() {
+                            if (controller.selectedPageType.value == "Utility Page") {
+                              return UtilityInputComponent(pageInfo: pageInfo);
+                            } else if (controller.selectedPageType.value == "Biller Page") {
+                              return InputComponent(pageInfo: pageInfo);
+                            } else if (controller.selectedPageType.value == "Dynamic Single Page") {
+                              return DynamicSinglePage(pageInfo: pageInfo);
+                            } else {
+                              return const Center(
+                                child: Text(
+                                  "Please select a page type.",
+                                  style: TextStyle(color: Colors.grey),
+                                ),
+                              );
+                            }
+                          }),
+                        ],
                       ),
                     ),
-                    Expanded(
-                      flex: 1,
-                      child: Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start, // Align content to the top
-                          children: [
-                            Obx(() {
-                              if (controller.selectedPageType.value == "Utility Page") {
-                                return  UtilityInputList(); // Display UtilityInputList
-                              } else if (controller.selectedPageType.value == "Biller Page") {
-                                return MyComponentList(pageInfo: pageInfo); // Display MyComponentList
-                              } else {
-                                return const Center(
-                                  child: Text(
-                                    "Please select a valid page type.",
-                                    style: TextStyle(color: Colors.grey),
-                                  ),
-                                );
-                              }
-                            }),
-                          ],
-                        ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Obx(() {
+                            if (controller.selectedPageType.value == "Utility Page") {
+                              return UtilityInputList();
+                            } else if (controller.selectedPageType.value == "Biller Page") {
+                              return MyComponentList(pageInfo: pageInfo);
+                            } else if (controller.selectedPageType.value == "Dynamic Single Page") {
+                              return const DynamicPageView();
+                            } else {
+                              return const Center(
+                                child: Text(
+                                  "Please select a valid page type.",
+                                  style: TextStyle(color: Colors.grey),
+                                ),
+                              );
+                            }
+                          }),
+                        ],
                       ),
                     ),
-
-
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
         ],
-      ),
+      )
+
     );
   }
 }

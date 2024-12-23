@@ -107,6 +107,8 @@ class UtilityInputController extends GetxController {
     return null; // No validation errors
   }
 
+
+
   // Clear utility-specific inputs
   void _clearUtilityInputs() {
     selectedUtilityTypeValue.value = '';  // Reset utility type

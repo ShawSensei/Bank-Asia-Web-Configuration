@@ -1,14 +1,27 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../util/utility_variables.dart';
+
 class ScreenSelectionController extends GetxController {
-  // Observable list of page types
-  var pageTypes = ["Utility Page", "Biller Page"].obs; // Use RxList for observables
-
-  // Observable selected page type
+  var pageTypes = ["Utility Page", "Biller Page", "Dynamic Single Page"].obs;
   var selectedPageType = Rx<String?>(null);
+  final TextEditingController pageNameController = TextEditingController();
+  final RxString pageName = ''.obs;
 
-  // Method to update the selected page type
   void updateSelectedPageType(String? value) {
     selectedPageType.value = value;
+    UtilityVariables.selectedPageType.value = value;
+  }
+
+  void updatePageName(String value) {
+    pageName.value = value;
+    UtilityVariables.pageName.value = value;
+  }
+
+  @override
+  void onClose() {
+    pageNameController.dispose();
+    super.onClose();
   }
 }

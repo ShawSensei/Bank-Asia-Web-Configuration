@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_web/presentation/view/page_setup/input_component.dart';
 import 'package:get/get.dart';
 import '../../../domain/model/request_model/page_info.dart';
 import '../../../domain/model/response_model/utility_data_model.dart';
 import '../../controller/controller/utility_list_controller.dart';
+import '../screen_type_selection/component_selection_screen.dart';
 
 class UtilityInputList extends StatelessWidget {
   // Using Get.put to manage the controller and initialize it
@@ -96,7 +98,17 @@ class UtilityInputList extends StatelessWidget {
             // Delete the utility and trigger a UI update
             _controller.deleteUtility(index);
           },
+
         ),
+        onTap: () {
+          // Navigate to UtilityInputComponent and pass utility as argument
+          Get.to(
+                () => ComponentSelectionScreen(
+              pageInfo: PageInfo(pageRoute: "utilityDetail"),
+            ),
+            arguments: utility, // Pass the selected utility as an argument
+          );
+        },
       ),
     );
   }
